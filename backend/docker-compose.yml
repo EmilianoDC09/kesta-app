@@ -1,0 +1,18 @@
+# PostgreSQL 16 + PostGIS para desarrollo. Alternativa a instalar PostgreSQL en el equipo.
+# Usa el puerto 5440 del host para no chocar con una instalacion local (5432-5434).
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: kesta-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kesta_bd
+    ports:
+      - "5440:5432"
+    volumes:
+      - kesta_pgdata:/var/lib/postgresql/data
+      - ./db/docker-init:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  kesta_pgdata:
