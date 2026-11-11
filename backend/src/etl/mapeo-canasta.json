@@ -1,0 +1,144 @@
+{
+  "version": "1.0.0",
+  "fuente": "Profeco QQP",
+  "municipio": "Morelia",
+  "estado": "Michoacán",
+  "productos": [
+    {
+      "canonico": "Aceite",
+      "alias": ["Aceite", "Aceite vegetal"]
+    },
+    {
+      "canonico": "Arroz",
+      "alias": ["Arroz"]
+    },
+    {
+      "canonico": "Atún",
+      "alias": ["Atún", "Atún enlatado", "Atún en conserva"]
+    },
+    {
+      "canonico": "Avena",
+      "alias": ["Avena", "Avena en hojuelas"]
+    },
+    {
+      "canonico": "Azúcar",
+      "alias": ["Azúcar"]
+    },
+    {
+      "canonico": "Frijol",
+      "alias": ["Frijol", "Frijoles"]
+    },
+    {
+      "canonico": "Lenteja",
+      "alias": ["Lenteja", "Lentejas"]
+    },
+    {
+      "canonico": "Harina de Maíz",
+      "alias": ["Harina de Maíz", "Harina de Maíz Nixtamalizado"]
+    },
+    {
+      "canonico": "Harina de Trigo",
+      "alias": ["Harina de Trigo"]
+    },
+    {
+      "canonico": "Pasta para Sopa",
+      "alias": ["Pasta para Sopa", "Pasta de Sopa"]
+    },
+    {
+      "canonico": "Tortilla de Maíz",
+      "alias": ["Tortilla de Maíz", "Tortillas de Maíz"]
+    },
+    {
+      "canonico": "Pan Blanco Bolillo",
+      "alias": ["Pan Blanco Bolillo", "Bolillo", "Pan Bolillo"]
+    },
+    {
+      "canonico": "Huevo",
+      "alias": ["Huevo", "Huevos"]
+    },
+    {
+      "canonico": "Leche Ultrapasteurizada",
+      "alias": ["Leche Ultrapasteurizada", "Leche UHT"]
+    },
+    {
+      "canonico": "Carne Pollo",
+      "alias": ["Carne Pollo", "Carne de Pollo"]
+    },
+    {
+      "canonico": "Carne Res",
+      "alias": ["Carne Res", "Carne de Res"]
+    },
+    {
+      "canonico": "Carne Cerdo",
+      "alias": ["Carne Cerdo", "Carne de Cerdo"]
+    },
+    {
+      "canonico": "Sardina",
+      "alias": ["Sardina", "Sardinas", "Sardina enlatada"]
+    },
+    {
+      "canonico": "Sal Molida de Mesa",
+      "alias": ["Sal Molida de Mesa", "Sal de Mesa", "Sal Molida"]
+    },
+    {
+      "canonico": "Jabón de Tocador",
+      "alias": ["Jabón de Tocador", "Jabón de Baño"]
+    },
+    {
+      "canonico": "Papel Higiénico",
+      "alias": ["Papel Higiénico", "Papel Sanitario"]
+    },
+    {
+      "canonico": "Detergente P/ropa",
+      "alias": ["Detergente P/ropa", "Detergente para Ropa"]
+    },
+    {
+      "canonico": "Café Soluble",
+      "alias": ["Café Soluble", "Café Instantáneo"]
+    },
+    {
+      "canonico": "Pan de Caja",
+      "alias": ["Pan de Caja", "Pan de Molde"]
+    },
+    {
+      "canonico": "Galletas Saladas",
+      "alias": ["Galletas Saladas"]
+    },
+    {
+      "canonico": "Mayonesa",
+      "alias": ["Mayonesa"]
+    },
+    {
+      "canonico": "Leche en Polvo",
+      "alias": ["Leche en Polvo"]
+    },
+    {
+      "canonico": "Garbanzo",
+      "alias": ["Garbanzo", "Garbanzos"]
+    },
+    {
+      "canonico": "Tostadas de Maíz",
+      "alias": ["Tostadas de Maíz", "Tostada de Maíz"]
+    },
+    {
+      "canonico": "Puré de Tomate",
+      "alias": ["Puré de Tomate", "Puré de Jitomate"]
+    },
+    {
+      "canonico": "Mantequilla",
+      "alias": ["Mantequilla"]
+    },
+    {
+      "canonico": "Galletas Dulces",
+      "alias": ["Galletas Dulces"]
+    },
+    {
+      "canonico": "Leche Evaporada",
+      "alias": ["Leche Evaporada"]
+    },
+    {
+      "canonico": "Chile Seco",
+      "alias": ["Chile Seco", "Chiles Secos"]
+    }
+  ]
+}
