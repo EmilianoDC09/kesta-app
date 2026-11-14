@@ -9,6 +9,12 @@ val KestaGreen = Color(0xFF0A4033)
 val KestaGold = Color(0xFFB6822B)
 val KestaSurface = Color(0xFFFAF8F3)
 
+// Neutros de los mockups de acceso (Figma)
+val KestaBorder = Color(0xFFD9D9D9)
+val KestaTextMuted = Color(0xFF9E9E9E)
+val KestaTabInactive = Color(0xFFF7F7F7)
+val KestaTextPrimary = Color(0xFF1F1F1F)
+
 private val KestaColors = lightColorScheme(
     primary = KestaGreen,
     onPrimary = Color.White,

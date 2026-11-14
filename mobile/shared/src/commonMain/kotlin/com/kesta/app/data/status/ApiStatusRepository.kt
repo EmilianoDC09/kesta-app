@@ -1,4 +1,4 @@
-package com.kesta.app.data.repository
+package com.kesta.app.data.status
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -10,7 +10,7 @@ data class ApiStatus(val httpCode: Int, val bytes: Int)
 
 /**
  * Interfaz de repositorio: el ViewModel depende de esto, no de Ktor.
- * Permite una implementacion de prueba (requisito de 6.2).
+ * La implementacion de prueba (FakeApiStatusRepository) vive en commonTest.
  */
 interface ApiStatusRepository {
     suspend fun check(): Result<ApiStatus>
@@ -26,8 +26,4 @@ class KtorApiStatusRepository(private val client: HttpClient) : ApiStatusReposit
         }
         ApiStatus(response.status.value, response.bodyAsText().length)
     }
-}
-
-class FakeApiStatusRepository(private val result: Result<ApiStatus>) : ApiStatusRepository {
-    override suspend fun check(): Result<ApiStatus> = result
 }
