@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/scripts/migrate.ts",
     "db:seed": "tsx src/scripts/seed.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "etl:profeco": "tsx src/etl/cargar-profeco.ts --api --aplicar"
   },
   "engines": {
     "node": ">=20"

@@ -2,157 +2,101 @@
 
 ## Descripción
 
-Pipeline ETL desarrollado en TypeScript para extraer,
-transformar y cargar precios reales de Profeco en la
-base de datos PostgreSQL de Kesta.
+Se implementó un pipeline ETL en TypeScript para extraer, transformar y cargar precios de Profeco (QQP) en PostgreSQL, utilizando Morelia, Michoacán, como ciudad piloto.
 
-La ciudad piloto es Morelia, Michoacán.
+Se incorporaron dos periodos de información:
 
-## Fuente de información
+| Archivo | Periodo | Registros |
+|---|---|---:|
+| `QQP_Morelia_2026.csv` | Enero–marzo 2026 | 68,330 |
+| `QQP_Morelia_2026_2.csv` | Julio 2026 | 33,578 |
 
-- Profeco: Quién es Quién en los Precios (QQP).
-- https://datos.profeco.gob.mx/index.php#quien-precios
-- Archivo: QQP_Morelia_2026.csv.
-- Periodo: 02/01/2026 al 31/03/2026.
+**Fuente:** https://datos.profeco.gob.mx/index.php#quien-precios
 
-## Requisitos
+## Cambios realizados
 
-- Node.js 20 o superior.
-- Docker Desktop.
-- PostgreSQL con PostGIS.
-- Dependencias instaladas mediante npm ci.
-- Archivo .env configurado.
-- Migraciones de base de datos aplicadas.
+- Procesamiento independiente de ambos archivos CSV.
+- Selección del archivo mediante el parámetro `--archivo`.
+- Normalización y vinculación de productos con el catálogo de Kesta.
+- Prevención de duplicados mediante SHA-256.
+- Conservación de fechas originales y trazabilidad de registros.
+- Integración de 5,949 precios adicionales de julio de 2026.
+- Verificación de datos en PostgreSQL y mediante la API REST.
 
-## Estructura principal
+## Ejecución para el equipo
 
-| Archivo | Función |
-|---|---|
-| extraer.ts | Lectura del CSV |
-| transformar.ts | Validación y limpieza |
-| unidades.ts | Normalización de presentaciones |
-| canasta.ts | Selección de productos |
-| mapeo-canasta.json | Productos canónicos y alias |
-| catalogo-profeco.ts | Generación del catálogo |
-| cargar-catalogo.ts | Carga del catálogo |
-| mapear.ts | Vinculación y creación de presentaciones |
-| cargar-profeco.ts | Ingesta de precios |
-| probar-mapeo.ts | Prueba de creación automática |
+Después de clonar el repositorio, ingresar a la carpeta `Backend`.
 
-## Instrucciones de ejecución
+**1. Preparar el entorno**
 
-Ejecutar desde el directorio Backend.
+```bash
+npm ci
+docker compose up -d
+npm run db:migrate
+```
 
-1. Iniciar PostgreSQL:
+Configurar el archivo `.env` y colocar los dos CSV dentro de `Backend/datos/`. Los archivos de datos no están incluidos en el repositorio.
 
-   docker compose up -d
+**2. Cargar el catálogo inicial**
 
-2. Instalar dependencias:
+```bash
+npx tsx src/etl/catalogo-profeco.ts
+npx tsx src/etl/cargar-catalogo.ts --aplicar
+```
 
-   npm ci
+**3. Cargar los precios**
 
-3. Aplicar migraciones:
+```bash
+npx tsx src/etl/cargar-profeco.ts --archivo QQP_Morelia_2026.csv --aplicar
+npx tsx src/etl/cargar-profeco.ts --archivo QQP_Morelia_2026_2.csv --aplicar
+```
 
-   npm run db:migrate
+**4. Iniciar el backend**
 
-4. Colocar el archivo QQP_Morelia_2026.csv
-   dentro de la carpeta datos/.
+```bash
+npm run dev
+```
 
-5. Generar el catálogo:
+Verificar en `http://localhost:3000/health`.
 
-   npx tsx src/etl/catalogo-profeco.ts
+## Resultados
 
-6. Simular la carga del catálogo:
-
-   npx tsx src/etl/cargar-catalogo.ts
-
-7. Guardar el catálogo:
-
-   npx tsx src/etl/cargar-catalogo.ts --aplicar
-
-8. Simular la ingesta de precios:
-
-   npx tsx src/etl/cargar-profeco.ts
-
-9. Ejecutar la ingesta definitiva:
-
-   npx tsx src/etl/cargar-profeco.ts --aplicar
-
-## Resultados obtenidos
-
-| Indicador | Total |
-|---|---:|
-| Registros procesados | 68330 |
-| Productos canónicos | 34 |
-| Categorías | 21 |
-| Marcas | 133 |
-| Unidades | 4 |
-| Presentaciones | 430 |
-| Precios cargados | 13189 |
-| Comercios | 12 |
-| Ubicaciones comerciales | 30 |
-| Registros externos | 54060 |
-| Duplicados iniciales | 1081 |
-| Descartes | 0 |
-
-## Prueba de idempotencia
-
-Se ejecutó dos veces el pipeline con el mismo archivo.
-
-| Indicador | Primera ejecución | Segunda ejecución |
+| Indicador | Enero–marzo | Julio |
 |---|---:|---:|
-| Leídas | 68330 | 68330 |
-| Cargadas | 13189 | 0 |
-| Duplicadas | 1081 | 68330 |
-| Sin vincular nuevos | 54060 | 0 |
-| Descartadas | 0 | 0 |
+| Registros procesados | 68,330 | 33,578 |
+| Precios cargados | 13,189 | 5,949 |
+| Registros sin vincular | 54,060 | 27,141 |
+| Descartados | 0 | 0 |
 
-La segunda ejecución no generó precios ni registros
-externos duplicados.
+La prueba de idempotencia confirmó que volver a procesar los archivos no genera nuevos precios duplicados.
 
-## Creación automática de presentaciones
+## Actividad 5.2 — Ingesta mediante API de Profeco
 
-El sistema permite crear presentaciones cuando el
-producto, la marca asociada y la unidad están
-reconocidos en el catálogo.
+Se implementó la consulta directa a la API de Profeco para obtener y cargar precios de la canasta básica en Morelia, Michoacán, sin depender de archivos CSV.
 
-Prueba:
+### Comandos de ejecución
 
-    npx tsx src/etl/probar-mapeo.ts
+Ejecutar desde la carpeta `Backend`.
 
-Resultados:
+**1. Simulación (sin guardar cambios):**
 
-- Creación automática: correcta.
-- Prevención de duplicados: correcta.
-- Reversión de datos de prueba: correcta.
+```bash
+npx tsx src/etl/cargar-profeco.ts --api
+```
 
-## Trazabilidad
+**2. Ejecución real (guarda registros nuevos en PostgreSQL):**
 
-La migración 004_ingesta_comun.sql incorpora las
-estructuras necesarias para registrar ejecuciones,
-productos externos, descartes y claves de origen.
+```bash
+npm run etl:profeco
+```
 
-Se utiliza SHA-256 para identificar observaciones
-y evitar registros duplicados.
+También puede ejecutarse directamente mediante:
 
-## Limitaciones y consideraciones
+```bash
+npx tsx src/etl/cargar-profeco.ts --api --aplicar
+```
+La simulación confirmó que la extracción funciona y que el ETL identifica registros previamente almacenados, evitando duplicados.
 
-- Los precios importados son históricos.
-- Se conservan las fechas originales de Profeco.
-- Existen 76 registros con presentaciones ambiguas.
-- Los productos fuera del mapeo se conservan en
-  productos_externos.
-- El catálogo y sus alias requieren revisión del equipo.
-- La integridad del archivo original debe verificarse.
-- La clasificación de comercios y las decisiones de
-  integración requieren validación del equipo.
-- Los archivos de datos y las credenciales no se
-  incluyen en el repositorio.
+### Consideraciones
 
-## Estado
-
-Pipeline implementado y probado localmente.
-
-Rama de desarrollo: feature/profeco-etl.
-
-Pendiente de revisión e integración con el equipo.
+El proceso conserva las fechas originales de Profeco y cancela la carga si falla alguna consulta. Las observaciones idénticas no se insertan nuevamente.

@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
+import path from 'node:path';
 import { PoolClient } from 'pg';
 
 import { pool } from '../db';
 import { extraerDatos } from './extraer';
+import { extraerCanastaProfeco } from './extraer-profeco-api';
 import { mapearProducto } from './mapear';
 
 import {
@@ -310,9 +312,23 @@ async function guardarDescarte(
 async function cargarProfeco(): Promise<void> {
 
     const aplicar = process.argv.includes('--aplicar');
+    const usarAPI = process.argv.includes('--api');
+    const indiceArchivo = process.argv.indexOf('--archivo');
+    if (usarAPI && indiceArchivo !== -1) {
+        throw new Error('No se pueden combinar --api y --archivo');
+    }
+    if (indiceArchivo !== -1 && (!process.argv[indiceArchivo + 1] || process.argv[indiceArchivo + 1].startsWith('--'))) {
+        throw new Error('Debes indicar el nombre del CSV después de --archivo');
+    }
+    const nombreArchivo = indiceArchivo !== -1
+        ? path.basename(process.argv[indiceArchivo + 1])
+        : 'QQP_Morelia_2026.csv';
+    const archivoEntrada = path.resolve(process.cwd(), 'datos', nombreArchivo);
+    const nombreOrigen = usarAPI
+        ? 'Profeco QQP API - Morelia'
+        : nombreArchivo;
 
     const client = await pool.connect();
-
     const contadores: Contadores = {
         leidas: 0,
         cargadas: 0,
@@ -320,77 +336,84 @@ async function cargarProfeco(): Promise<void> {
         sin_vincular: 0,
         descartadas: 0
     };
-
     const motivos = new Map<string, number>();
-
     let ejecucionId: number | null = null;
+    let bloqueoAdquirido = false;
+    let transaccionAbierta = false;
 
     try {
+        // Bloqueo de sesion: cubre extraccion y carga, incluso entre procesos.
+        const bloqueo = await client.query(
+            'SELECT pg_try_advisory_lock(51001) AS adquirido'
+        );
+        if (bloqueo.rows[0].adquirido !== true) {
+            throw new Error('Ya existe una ejecucion del ETL Profeco en curso');
+        }
+        bloqueoAdquirido = true;
 
-        // Registrar la ejecucion.
+        // La ejecucion real se registra fuera de la transaccion de carga.
         if (aplicar) {
-
             const ejecucion = await client.query(`
-                INSERT INTO ejecuciones_ingesta (
-                    tipo,
-                    origen,
-                    estado
-                )
-                VALUES (
-                    'profeco',
-                    'QQP_Morelia_2026.csv',
-                    'en_proceso'
-                )
+                INSERT INTO ejecuciones_ingesta (tipo, origen, estado)
+                VALUES ('profeco', $1, 'en_proceso')
                 RETURNING id
-            `);
-
+            `, [nombreOrigen]);
             ejecucionId = ejecucion.rows[0].id;
         }
 
+        console.log(aplicar
+            ? 'Iniciando carga real de Profeco...'
+            : 'Iniciando simulacion de Profeco...');
+
+        // Las consultas externas ocurren ANTES de abrir la transaccion.
+        const extraccionAPI = usarAPI
+            ? await extraerCanastaProfeco()
+            : null;
+
+        if (extraccionAPI) {
+            console.log('\n--- CONSULTAS PROFECO API ---');
+            console.log('Exitosas:', extraccionAPI.consultasExitosas.length);
+            console.log('Fallidas:', extraccionAPI.consultasFallidas.length);
+            console.log('Registros obtenidos:', extraccionAPI.registros.length);
+
+            if (extraccionAPI.consultasFallidas.length > 0) {
+                console.table(extraccionAPI.consultasFallidas);
+                throw new Error('Extraccion incompleta: no se aplicaran cambios.');
+            }
+            if (extraccionAPI.consultasExitosas.length === 0 ||
+                extraccionAPI.registros.length === 0) {
+                throw new Error('Profeco no devolvio registros; no se aplicaran cambios.');
+            }
+        }
+
+        const origenRegistros = extraccionAPI
+            ? extraccionAPI.registros
+            : extraerDatos(archivoEntrada);
+
         await client.query('BEGIN');
-
-        // Evitar ejecuciones simultaneas de este ETL.
-        await client.query(`
-            SELECT pg_advisory_xact_lock(51001)
-        `);
+        transaccionAbierta = true;
 
         await client.query(`
-            LOCK TABLE fuentes, comercios,
-                ubicaciones_comercio
+            LOCK TABLE fuentes, comercios, ubicaciones_comercio
             IN SHARE ROW EXCLUSIVE MODE
         `);
 
+        // La simulacion registra su ejecucion dentro de la transaccion
+        // para que el ROLLBACK no deje cambios persistentes.
         if (!aplicar) {
-
             const ejecucion = await client.query(`
-                INSERT INTO ejecuciones_ingesta (
-                    tipo,
-                    origen,
-                    estado
-                )
-                VALUES (
-                    'profeco',
-                    'QQP_Morelia_2026.csv',
-                    'en_proceso'
-                )
+                INSERT INTO ejecuciones_ingesta (tipo, origen, estado)
+                VALUES ('profeco', $1, 'en_proceso')
                 RETURNING id
-            `);
-
+            `, [nombreOrigen]);
             ejecucionId = ejecucion.rows[0].id;
         }
 
         const idEjecucion = ejecucionId!;
-
         const fuenteId = await obtenerFuente(client);
 
-        console.log(
-            aplicar
-                ? 'Iniciando carga real de Profeco...'
-                : 'Iniciando simulacion de Profeco...'
-        );
+        for await (const registro of origenRegistros) {
 
-        // Procesar cada registro del CSV.
-        for await (const registro of extraerDatos()) {
 
             contadores.leidas++;
 
@@ -427,7 +450,6 @@ async function cargarProfeco(): Promise<void> {
             `, [clave]);
 
             if (duplicado.rows.length > 0) {
-
                 contadores.duplicadas++;
                 continue;
             }
@@ -595,6 +617,7 @@ async function cargarProfeco(): Promise<void> {
         if (aplicar) {
 
             await client.query('COMMIT');
+            transaccionAbierta = false;
 
             console.log(
                 '\nCarga de Profeco completada correctamente.'
@@ -603,6 +626,7 @@ async function cargarProfeco(): Promise<void> {
         } else {
 
             await client.query('ROLLBACK');
+            transaccionAbierta = false;
 
             console.log('\nSimulacion completada.');
             console.log('No se guardaron registros.');
@@ -610,7 +634,10 @@ async function cargarProfeco(): Promise<void> {
 
     } catch (error) {
 
-        await client.query('ROLLBACK');
+        if (transaccionAbierta) {
+            await client.query('ROLLBACK');
+            transaccionAbierta = false;
+        }
 
         if (aplicar && ejecucionId !== null) {
 
@@ -629,8 +656,13 @@ async function cargarProfeco(): Promise<void> {
         throw error;
 
     } finally {
-
-        client.release();
+        try {
+            if (bloqueoAdquirido) {
+                await client.query('SELECT pg_advisory_unlock(51001)');
+            }
+        } finally {
+            client.release();
+        }
     }
 }
 

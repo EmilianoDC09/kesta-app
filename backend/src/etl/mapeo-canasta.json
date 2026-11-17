@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "fuente": "Profeco QQP",
   "municipio": "Morelia",
   "estado": "Michoacán",
@@ -139,6 +139,38 @@
     {
       "canonico": "Chile Seco",
       "alias": ["Chile Seco", "Chiles Secos"]
+    },
+    {
+      "canonico": "Manzana",
+      "alias": ["Manzana", "Manzanas"]
+    },
+    {
+      "canonico": "Plátano",
+      "alias": ["Plátano", "Plátanos", "Banano"]
+    },
+    {
+      "canonico": "Papaya",
+      "alias": ["Papaya", "Papayas"]
+    },
+    {
+      "canonico": "Limón",
+      "alias": ["Limón", "Limones"]
+    },
+    {
+      "canonico": "Cebolla",
+      "alias": ["Cebolla", "Cebollas"]
+    },
+    {
+      "canonico": "Jitomate",
+      "alias": ["Jitomate", "Jitomates"]
+    },
+    {
+      "canonico": "Papa",
+      "alias": ["Papa", "Papas"]
+    },
+    {
+      "canonico": "Zanahoria",
+      "alias": ["Zanahoria", "Zanahorias"]
     }
   ]
 }
