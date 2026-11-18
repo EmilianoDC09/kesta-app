@@ -3,8 +3,8 @@ package com.kesta.app.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kesta.app.core.ui.UiState
-import com.kesta.app.data.repository.ApiStatus
-import com.kesta.app.data.repository.ApiStatusRepository
+import com.kesta.app.data.status.ApiStatus
+import com.kesta.app.data.status.ApiStatusRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

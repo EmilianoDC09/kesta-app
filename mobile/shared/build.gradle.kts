@@ -43,11 +43,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
-<<<<<<< Updated upstream
-=======
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.activity.compose)
->>>>>>> Stashed changes
         }
         iosMain.dependencies{
             implementation(libs.ktor.client.darwin)
@@ -63,13 +60,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.contentNegotiation)
             implementation(libs.ktor.serialization.kotlinxJson)
             implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
 
         }
         getByName("androidDeviceTest").dependencies {
@@ -80,4 +77,10 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
+}
+// Recursos compartidos (logos) en src/commonMain/composeResources.
+// Clase generada: com.kesta.app.resources.Res
+compose.resources {
+    packageOfResClass = "com.kesta.app.resources"
+    publicResClass = false
 }

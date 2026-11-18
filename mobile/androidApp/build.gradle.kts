@@ -19,6 +19,11 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
+// URL del backend para la compilacion release. El valor por defecto es invalido a proposito:
+// una release sin servidor configurado falla con "sin conexion" en vez de apuntar a localhost.
+val releaseApiBaseUrl: String = providers.gradleProperty("kesta.api.baseUrl.release")
+    .getOrElse("https://configurar-servidor-piloto.invalid/api/v1/")
+
 android {
     namespace = "com.kesta.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -36,7 +41,13 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // PC de desarrollo por USB: adb reverse tcp:3000 tcp:3000
+            buildConfigField("String", "API_BASE_URL", "\"http://localhost:3000/api/v1/\"")
+        }
         release {
+            // Servidor del piloto (HTTPS). Se define en gradle.properties: kesta.api.baseUrl.release
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -50,5 +61,6 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }

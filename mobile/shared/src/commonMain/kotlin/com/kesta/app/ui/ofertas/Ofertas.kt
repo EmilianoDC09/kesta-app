@@ -9,6 +9,8 @@ import com.kesta.app.data.comparison.PrecioEnComercio
 import com.kesta.app.ui.comparison.OfertaAhorroUi
 import com.kesta.app.ui.comparison.PrecioOfertaUi
 import com.kesta.app.ui.comparison.SinComparacionUi
+import com.kesta.app.ui.home.OfertaUi
+import com.kesta.app.ui.home.ProductoFrecuenteUi
 
 /*
  * Convierte lo que responde la base de datos (productos y sus precios) en las ofertas que se muestran
@@ -148,7 +150,7 @@ fun Oferta.aOfertaAhorroUi() = OfertaAhorroUi(
 )
 
 /** La versión corta de la oferta para las tarjetas del Home. */
-fun Oferta.aOfertaUi() = _root_ide_package_.com.kesta.app.ui.home.OfertaUi(
+fun Oferta.aOfertaUi() = OfertaUi(
     nombre = producto.nombre,
     precio = mejor.precio.comoPesos(),
     precioAnterior = comparado.precio.comoPesos(),
@@ -158,9 +160,9 @@ fun Oferta.aOfertaUi() = _root_ide_package_.com.kesta.app.ui.home.OfertaUi(
 )
 
 /** Un producto para "Productos frecuentes": su precio más bajo. Null si no tiene precios. */
-fun DatosPrecio.aProductoFrecuenteUi(): com.kesta.app.ui.home.ProductoFrecuenteUi? {
+fun DatosPrecio.aProductoFrecuenteUi(): ProductoFrecuenteUi? {
     val precio = comparacion.comercios.minOfOrNull { it.precio } ?: return null
-    return _root_ide_package_.com.kesta.app.ui.home.ProductoFrecuenteUi(
+    return ProductoFrecuenteUi(
         nombre = producto.nombre,
         precio = precio.comoPesos(),
         icono = iconoDe(producto.nombre)

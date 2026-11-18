@@ -16,17 +16,12 @@ kotlin = "2.4.21"
 material3 = "1.12.0-alpha03"
 ktor = "3.5.0"
 kotlinxSerialization = "1.10.0"
-<<<<<<< Updated upstream
-kotlinxCoroutines = "1.9.0"
-=======
 composeIcons = "1.7.3"
->>>>>>> Stashed changes
 
 [libraries]
 compose-materialIconsCore = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "composeIcons" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
@@ -48,6 +43,7 @@ ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotia
 ktor-serialization-kotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 

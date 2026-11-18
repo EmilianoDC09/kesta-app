@@ -1,17 +1,5 @@
 package com.kesta.app.ui.home
 
-<<<<<<< Updated upstream
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-=======
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,29 +31,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
->>>>>>> Stashed changes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-<<<<<<< Updated upstream
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.kesta.app.core.ui.UiState
-import com.kesta.app.data.repository.ApiStatus
-import com.kesta.app.di.AppContainer
-import com.kesta.app.ui.theme.KestaGold
-=======
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -95,7 +64,6 @@ import com.kesta.app.ui.theme.KestaRed
 import com.kesta.app.ui.theme.KestaTextMuted
 import com.kesta.app.ui.theme.KestaTextPrimary
 import com.kesta.app.ui.theme.KestaTheme
->>>>>>> Stashed changes
 
 
 data class OfertaUi(
@@ -127,24 +95,9 @@ data class ServicioUi(
     val icono: String,
 )
 
-/**
- * Pantalla de inicio. Conserva los tres datos que le da App (usuario, cerrandoSesion, onLogout)
- * para no tocar la navegación de sesión
- *
- * La navegación entre Home y Mayor ahorro vive en MainFlow.
- */
+/** Pantalla de inicio de la aplicación. */
 @Composable
 fun HomeScreen(
-<<<<<<< Updated upstream
-    viewModel: HomeViewModel = viewModel<HomeViewModel>(
-        factory = viewModelFactory {
-            initializer { HomeViewModel(AppContainer.apiStatusRepository) }
-        }
-    ),
-) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    HomeContent(state = state, onCheckConnection = viewModel::checkConnection)
-=======
     usuario: Usuario?,
     cerrandoSesion: Boolean,
     onLogout: () -> Unit,
@@ -154,54 +107,10 @@ fun HomeScreen(
         cerrandoSesion = cerrandoSesion,
         onLogout = onLogout,
     )
->>>>>>> Stashed changes
 }
 
-/** Sin ViewModel: fácil de previsualizar. Cada acción del usuario sale por una función. */
 @Composable
 fun HomeContent(
-<<<<<<< Updated upstream
-    state: UiState<ApiStatus>,
-    onCheckConnection: () -> Unit,
-) {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier = Modifier.fillMaxSize().safeContentPadding().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    append("ke")
-                    withStyle(SpanStyle(color = KestaGold)) { append("S") }
-                    append("ta")
-                },
-                fontSize = 56.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "Compara precios entre tiendas y tianguis para ahorrar y comprar mejor.",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Spacer(Modifier.height(32.dp))
-            Button(
-                onClick = onCheckConnection,
-                enabled = state !is UiState.Loading,
-            ) {
-                Text("Probar conexion con el servidor")
-            }
-            Spacer(Modifier.height(16.dp))
-            when (state) {
-                UiState.Idle -> Unit
-                UiState.Loading -> CircularProgressIndicator()
-                UiState.Empty -> Text("Sin datos")
-                is UiState.Success -> Text("Servidor disponible (HTTP ${state.data.httpCode})")
-                is UiState.Error -> Text(
-                    text = "Error: ${state.message}",
-                    color = MaterialTheme.colorScheme.error,
-=======
     usuario: Usuario?,
     cerrandoSesion: Boolean,
     onLogout: () -> Unit,
@@ -328,7 +237,6 @@ fun HomeContent(
                     onReportar = onReportar,
                     onCanasta = onCanasta,
                     onPerfil = onPerfil,
->>>>>>> Stashed changes
                 )
             }
         }
@@ -554,52 +462,5 @@ private fun ServicioCard(servicio: ServicioUi) {
             Text(servicio.nombre, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = KestaTextPrimary)
             Text("desde ${servicio.precio}", fontSize = 12.sp, color = KestaTextMuted)
         }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Vistas previas (solo para ver el diseño en Android Studio; no se usan en la app)
-// ---------------------------------------------------------------------------
-
-private val EjemploOfertas = listOf(
-    OfertaUi("Aguacate", "$45", "$54", "Ahorro 48%", "Tianguis del Tec", "🥑"),
-    OfertaUi("Jitomate", "$18", "$35", "Ahorro 48%", "Walmart", "🍅"),
-    OfertaUi("Gasolina premium", "$30", "$32", "Ahorro 6%", "Gasolinera Pemex", "⛽"),
-)
-private val EjemploAlertas = listOf(AlertaUi("Frijol Junio", "Morelia", "25%", subio = true, icono = "🫘"))
-private val EjemploFrecuentes = listOf(
-    ProductoFrecuenteUi("Frijol Junio", "$18", "🫘"),
-    ProductoFrecuenteUi("Huevo", "$30", "🥚"),
-    ProductoFrecuenteUi("Aguacate", "$54", "🥑"),
-    ProductoFrecuenteUi("Jitomate", "$25", "🍅"),
-    ProductoFrecuenteUi("Gasolina premium", "$26", "⛽"),
-    ProductoFrecuenteUi("Leche", "$22", "🥛"),
-)
-private val EjemploServicios = listOf(
-    ServicioUi("Gasolina premium", "$25 /lt", "⛽"),
-    ServicioUi("Gas LP", "$15 /kg", "💧"),
-)
-
-@Preview
-@Composable
-private fun HomeConContenidoPreview() {
-    KestaTheme {
-        HomeContent(
-            usuario = null,
-            cerrandoSesion = false,
-            onLogout = {},
-            ofertas = EjemploOfertas,
-            alertas = EjemploAlertas,
-            frecuentes = EjemploFrecuentes,
-            servicios = EjemploServicios,
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun HomeSinDatosPreview() {
-    KestaTheme {
-        HomeContent(usuario = null, cerrandoSesion = false, onLogout = {})
     }
 }
