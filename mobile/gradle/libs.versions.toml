@@ -16,9 +16,14 @@ kotlin = "2.4.21"
 material3 = "1.12.0-alpha03"
 ktor = "3.5.0"
 kotlinxSerialization = "1.10.0"
+<<<<<<< Updated upstream
 kotlinxCoroutines = "1.9.0"
+=======
+composeIcons = "1.7.3"
+>>>>>>> Stashed changes
 
 [libraries]
+compose-materialIconsCore = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "composeIcons" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }

@@ -43,11 +43,17 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
+<<<<<<< Updated upstream
+=======
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.activity.compose)
+>>>>>>> Stashed changes
         }
         iosMain.dependencies{
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
+            implementation(libs.compose.materialIconsCore)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
