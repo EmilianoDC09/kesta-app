@@ -1,3 +1,27 @@
-node_modules
-dist
+# ============================================================
+# Kesta backend - Node.js + TypeScript + Express + PostgreSQL
+# ============================================================
+
+# --- Dependencias ---
+node_modules/
+
+# --- Build de TypeScript (tsc -> dist/) ---
+dist/
+*.tsbuildinfo
+
+# --- Tests (vitest) ---
+coverage/
+
+# --- Variables de entorno (credenciales de BD, JWT) ---
 .env
+.env.*
+!.env.example
+
+# --- Logs ---
+*.log
+npm-debug.log*
+
+# --- IDE ---
+.idea/
+.vscode/*
+!.vscode/extensions.json
