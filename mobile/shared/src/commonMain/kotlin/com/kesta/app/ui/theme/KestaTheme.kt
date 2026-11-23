@@ -15,6 +15,12 @@ val KestaTextMuted = Color(0xFF9E9E9E)
 val KestaTabInactive = Color(0xFFF7F7F7)
 val KestaTextPrimary = Color(0xFF1F1F1F)
 
+val KestaGreenLight = Color(0xFFE3F3EA)
+
+val KestaGoldLight = Color(0xFFFFF4DC)
+
+val KestaRed = Color(0xFFD93025)
+
 private val KestaColors = lightColorScheme(
     primary = KestaGreen,
     onPrimary = Color.White,
