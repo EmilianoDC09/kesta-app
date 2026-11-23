@@ -11,12 +11,16 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/scripts/migrate.ts",
     "db:seed": "tsx src/scripts/seed.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "etl:profeco": "tsx src/etl/cargar-profeco.ts --api --aplicar"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "csv-parse": "^7.0.3",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "express-rate-limit": "^7.4.0",
