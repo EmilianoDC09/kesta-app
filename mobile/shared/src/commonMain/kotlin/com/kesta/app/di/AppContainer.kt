@@ -7,6 +7,12 @@ import com.kesta.app.data.auth.KtorSessionRepository
 import com.kesta.app.data.auth.SessionRepository
 import com.kesta.app.data.auth.TokenStore
 import com.kesta.app.data.auth.createApiClient
+import com.kesta.app.data.catalog.CatalogRepository
+import com.kesta.app.data.catalog.KtorCatalogRepository
+import com.kesta.app.data.comparison.KtorPriceRepository
+import com.kesta.app.data.comparison.PriceRepository
+import com.kesta.app.data.location.LocationProvider
+import com.kesta.app.data.location.MoreliaLocation
 import com.kesta.app.data.status.ApiStatusRepository
 import com.kesta.app.data.status.KtorApiStatusRepository
 
@@ -29,5 +35,12 @@ object AppContainer {
 
     val apiStatusRepository: ApiStatusRepository by lazy {
         KtorApiStatusRepository(apiClient)
+    }
+
+    val catalogRepository: CatalogRepository by lazy {
+        KtorCatalogRepository(apiClient)
+    }
+    val priceRepository: PriceRepository by lazy {
+        KtorPriceRepository(apiClient)
     }
 }

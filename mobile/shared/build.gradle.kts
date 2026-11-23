@@ -44,11 +44,13 @@ kotlin {
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.activity.compose)
         }
         iosMain.dependencies{
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
+            implementation(libs.compose.materialIconsCore)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
