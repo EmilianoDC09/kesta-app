@@ -1,19 +1,43 @@
-*.iml
-.kotlin
-.gradle
+# ============================================================
+# Kesta mobile - Kotlin Multiplatform (Android + iOS)
+# ============================================================
+
+# --- Gradle / Kotlin ---
+.gradle/
+.kotlin/
 **/build/
-xcuserdata
 !src/**/build/
 local.properties
-.idea
-.DS_Store
-captures
-.externalNativeBuild
-.cxx
+
+# --- Android Studio / IntelliJ ---
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# --- Artefactos y firma (nunca subir llaves) ---
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# --- Crashes de la JVM/Gradle ---
+hs_err_pid*.log
+replay_pid*.log
+
+# --- Xcode / iOS ---
+xcuserdata/
+DerivedData/
+*.xcuserstate
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+Pods/
+
+# --- Otros ---
 node_modules/
+.DS_Store
