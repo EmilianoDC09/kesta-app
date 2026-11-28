@@ -4,7 +4,6 @@ import { PoolClient } from 'pg';
 
 import { pool } from '../db';
 import { extraerDatos } from './extraer';
-import { extraerCanastaProfeco } from './extraer-profeco-api';
 import { mapearProducto } from './mapear';
 
 import {
@@ -312,10 +311,9 @@ async function guardarDescarte(
 async function cargarProfeco(): Promise<void> {
 
     const aplicar = process.argv.includes('--aplicar');
-    const usarAPI = process.argv.includes('--api');
     const indiceArchivo = process.argv.indexOf('--archivo');
-    if (usarAPI && indiceArchivo !== -1) {
-        throw new Error('No se pueden combinar --api y --archivo');
+    if (process.argv.includes('--api')) {
+        throw new Error('La carga desde el buscador QQP se movio a: npm run etl:qqp (src/etl/qqp-api/sincronizar.ts)');
     }
     if (indiceArchivo !== -1 && (!process.argv[indiceArchivo + 1] || process.argv[indiceArchivo + 1].startsWith('--'))) {
         throw new Error('Debes indicar el nombre del CSV después de --archivo');
@@ -324,9 +322,7 @@ async function cargarProfeco(): Promise<void> {
         ? path.basename(process.argv[indiceArchivo + 1])
         : 'QQP_Morelia_2026.csv';
     const archivoEntrada = path.resolve(process.cwd(), 'datos', nombreArchivo);
-    const nombreOrigen = usarAPI
-        ? 'Profeco QQP API - Morelia'
-        : nombreArchivo;
+    const nombreOrigen = nombreArchivo;
 
     const client = await pool.connect();
     const contadores: Contadores = {
@@ -365,30 +361,7 @@ async function cargarProfeco(): Promise<void> {
             ? 'Iniciando carga real de Profeco...'
             : 'Iniciando simulacion de Profeco...');
 
-        // Las consultas externas ocurren ANTES de abrir la transaccion.
-        const extraccionAPI = usarAPI
-            ? await extraerCanastaProfeco()
-            : null;
-
-        if (extraccionAPI) {
-            console.log('\n--- CONSULTAS PROFECO API ---');
-            console.log('Exitosas:', extraccionAPI.consultasExitosas.length);
-            console.log('Fallidas:', extraccionAPI.consultasFallidas.length);
-            console.log('Registros obtenidos:', extraccionAPI.registros.length);
-
-            if (extraccionAPI.consultasFallidas.length > 0) {
-                console.table(extraccionAPI.consultasFallidas);
-                throw new Error('Extraccion incompleta: no se aplicaran cambios.');
-            }
-            if (extraccionAPI.consultasExitosas.length === 0 ||
-                extraccionAPI.registros.length === 0) {
-                throw new Error('Profeco no devolvio registros; no se aplicaran cambios.');
-            }
-        }
-
-        const origenRegistros = extraccionAPI
-            ? extraccionAPI.registros
-            : extraerDatos(archivoEntrada);
+        const origenRegistros = extraerDatos(archivoEntrada);
 
         await client.query('BEGIN');
         transaccionAbierta = true;

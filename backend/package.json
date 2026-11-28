@@ -12,7 +12,10 @@
     "db:migrate": "tsx src/scripts/migrate.ts",
     "db:seed": "tsx src/scripts/seed.ts",
     "test": "vitest run",
-    "etl:profeco": "tsx src/etl/cargar-profeco.ts --api --aplicar"
+    "etl:profeco": "tsx src/etl/qqp-api/sincronizar.ts --aplicar",
+    "etl:qqp": "tsx src/etl/qqp-api/sincronizar.ts --aplicar",
+    "etl:qqp:simular": "tsx src/etl/qqp-api/sincronizar.ts",
+    "test:unit": "vitest run tests/unit"
   },
   "engines": {
     "node": ">=20"

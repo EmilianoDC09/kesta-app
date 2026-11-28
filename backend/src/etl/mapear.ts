@@ -2,7 +2,6 @@ import { PoolClient } from 'pg';
 import { RegistroProfeco, normalizarTexto } from './transformar';
 import { obtenerProductoCanonico, perteneceCanasta } from './canasta';
 import { normalizarPresentacion } from './unidades';
-import { adaptarProductoProfeco } from './adaptar-profeco-api';
 
 export type ResultadoMapeo =
   | {
@@ -33,36 +32,12 @@ function textoSQL(columna: string): string {
   `;
 }
 
-function variedadComparable(descripcion: string): string {
-  return normalizarTexto(descripcion)
-    .replace(
-      /\b\d+(?:[.,]\d+)?\s*(?:kilogramos?|kilos?|kg|gramos?|gr|g|mililitros?|ml|litros?|lts?|l)\b\.?/g,
-      ' '
-    )
-    .replace(
-      /\b(?:bolsa|caja|envase|lata|botella|tetrapak|tetra\s*pak|brick)\b/g,
-      ' '
-    )
-    .replace(/[.,;:()\-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 export async function mapearProducto(
   client: PoolClient,
   registro: RegistroProfeco
 ): Promise<ResultadoMapeo> {
-  const esAPI = registro.catalogo === 'API_PROFECO';
-
-  const adaptado = esAPI
-    ? adaptarProductoProfeco(registro.producto, registro.categoria)
-    : null;
-
-  const nombreParaMapear = esAPI
-    ? registro.categoria
-    : registro.producto;
-
-  const canonico = obtenerProductoCanonico(nombreParaMapear);
+  // Solo registros del CSV de datos abiertos. El buscador QQP tiene su propio emparejamiento en ./qqp-api.
+  const canonico = obtenerProductoCanonico(registro.producto);
 
   if (!canonico) {
     return {
@@ -71,10 +46,7 @@ export async function mapearProducto(
     };
   }
 
-  if (
-    !esAPI &&
-    !perteneceCanasta(registro.producto, registro.catalogo)
-  ) {
+  if (!perteneceCanasta(registro.producto, registro.catalogo)) {
     return {
       vinculado: false,
       motivo: 'Catalogo de Profeco fuera de seleccion'
@@ -83,28 +55,13 @@ export async function mapearProducto(
 
   const producto = normalizarTexto(canonico);
 
-  const marca = normalizarTexto(
-    adaptado?.marca ?? registro.marca
-  );
+  const marca = normalizarTexto(registro.marca);
 
-  const descripcionOriginal =
-    esAPI && adaptado
-      ? [adaptado.presentacion, adaptado.variedad]
-          .filter(Boolean)
-          .join(' - ')
-      : registro.presentacion.trim();
+  const descripcionOriginal = registro.presentacion.trim();
 
   const descripcion = normalizarTexto(descripcionOriginal);
 
-  const unidad =
-    esAPI &&
-    adaptado?.cantidad != null &&
-    adaptado.unidad
-      ? {
-          cantidad: adaptado.cantidad,
-          unidad: adaptado.unidad
-        }
-      : normalizarPresentacion(registro.presentacion);
+  const unidad = normalizarPresentacion(registro.presentacion);
 
   if (!unidad) {
     return {
@@ -222,33 +179,6 @@ export async function mapearProducto(
     };
   }
 
-  if (esAPI) {
-    const variedad = variedadComparable(descripcionOriginal);
-
-    if (variedad) {
-      const equivalentes = candidatas.rows.filter(
-        fila =>
-          variedadComparable(fila.descripcion) === variedad
-      );
-
-      if (equivalentes.length === 1) {
-        return {
-          vinculado: true,
-          productoId,
-          presentacionId: equivalentes[0].id,
-          creada: false
-        };
-      }
-
-      if (equivalentes.length > 1) {
-        return {
-          vinculado: false,
-          motivo: 'Multiples presentaciones equivalentes'
-        };
-      }
-    }
-  }
-
   if (exactas.length === 1) {
     return {
       vinculado: true,
@@ -258,24 +188,22 @@ export async function mapearProducto(
     };
   }
 
-  if (!esAPI) {
-    const asociacion = await client.query(
-      `
-        SELECT id
-        FROM presentaciones
-        WHERE producto_id = $1
-          AND marca_id = $2
-        LIMIT 1
-      `,
-      [productoId, marcaId]
-    );
+  const asociacion = await client.query(
+    `
+      SELECT id
+      FROM presentaciones
+      WHERE producto_id = $1
+        AND marca_id = $2
+      LIMIT 1
+    `,
+    [productoId, marcaId]
+  );
 
-    if (asociacion.rows.length === 0) {
-      return {
-        vinculado: false,
-        motivo: 'Marca sin asociacion previa con el producto'
-      };
-    }
+  if (asociacion.rows.length === 0) {
+    return {
+      vinculado: false,
+      motivo: 'Marca sin asociacion previa con el producto'
+    };
   }
 
   const unidades = await client.query(
